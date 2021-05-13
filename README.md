@@ -1,9 +1,20 @@
 # Chess OCR
 
+Demo 1
+
 ```
-curl -F "image=@data/example/ex000.png" http://chess-ocr.herokuapp.com/board_to_fen
-{"fen":"1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1","lichess":"https://lichess.org/editor/1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1","status":"success"}
+$ curl -s -F "image=@data/example/ex000.png" http://chess-ocr.herokuapp.com/board_to_fen | jq
+{
+  "fen": "1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1",
+  "lichess": "https://lichess.org/editor/1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1",
+  "status": "success"
+}
 ```
+
+Demo 2
+
+https://imgur.com/a/buJKxxK
+
 
 # Generate Dataset
 
