@@ -3,7 +3,7 @@ import PIL.Image as Image
 from .detector import Detector, detect_board
 
 app = Flask(__name__)
-detector = Detector('data/checkpoint/model-2021-04-22-17-35-08.pt')
+detector = Detector('data/checkpoint/model-2021-05-12-22-17-10.pt')
 
 
 def get_form_image():
@@ -17,6 +17,10 @@ def get_form_image():
   return image
 
 
+def to_lichess_url(fen):
+  return f"https://lichess.org/editor/{fen}"
+
+
 @app.errorhandler(RuntimeError)
 def handler(error):
   return {'status': 'error', 'message': error.args[0]}, 400
@@ -26,11 +30,11 @@ def handler(error):
 def route_detect():
   image = get_form_image()
   fen = detector.detect(image)
-  return {'status': 'success', 'fen': fen}
+  return {'status': 'success', 'fen': fen, 'lichess': to_lichess_url(fen)}
 
 
 @app.route('/board_to_fen', methods=['POST'])
 def route_board_to_fen():
   image = get_form_image()
   fen = detector.board_to_fen(image)
-  return {'status': 'success', 'fen': fen}
+  return {'status': 'success', 'fen': fen, 'lichess': to_lichess_url(fen)}

@@ -68,6 +68,7 @@ def to_fen(result):
 
 def detect_board(image, out_size):
     image = image.convert('L')
+    image.thumbnail([800, 800])
     x = np.array(image)
     y = detect_edge(x)
     quad = detect_quad(y)
@@ -82,10 +83,11 @@ def detect_board(image, out_size):
 
 
 def detect_edge(x):
-    x = cv.GaussianBlur(x, (7, 7), 7)
+    # TODO: these parameters are too sensitive to given image...
+    x = cv.GaussianBlur(x, (5, 5), 5)
     x = cv.Canny(x, 50, 50)
-    x = cv.dilate(x, np.ones([4, 4], dtype=np.uint8))
-    x = cv.erode(x, np.ones([3, 3], dtype=np.uint8))
+    x = cv.dilate(x, np.ones([3, 3], dtype=np.uint8))
+    x = cv.erode(x, np.ones([2, 2], dtype=np.uint8))
     return x
 
 

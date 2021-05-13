@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  chess-ocr:
+    image: registry.heroku.com/chess-ocr/web
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    network_mode: host
+    environment:
+      - PORT=5000
