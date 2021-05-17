@@ -3,7 +3,7 @@
 Demo 1
 
 ```
-$ curl -s -F "image=@data/example/ex000.png" http://chess-ocr.herokuapp.com/board_to_fen | jq
+$ curl -s -F "image=@data/example/ex000.png" https://web-vrnocjtpaa-an.a.run.app/board_to_fen
 {
   "fen": "1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1",
   "lichess": "https://lichess.org/editor/1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1",
@@ -86,6 +86,8 @@ curl -F "image=@data/example/ex000.png" http://localhost:5000/board_to_fen
 
 # Deployment
 
+- Deploy to Heroku
+
 ```
 # Build container image
 docker-compose build
@@ -104,4 +106,14 @@ heroku logs -t
 heroku login
 heroku container:login
 heroku apps:create chess-ocr
+```
+
+- Deploy to Google Cloud Run (cf. https://github.com/hi-ogawa/cloud-run-script)
+
+```
+wget -O run.sh https://raw.githubusercontent.com/hi-ogawa/cloud-run-script/master/run.sh
+bash run.sh setup-project
+bash run.sh setup-run
+bash run.sh deploy
+bash run.sh show url # => https://web-vrnocjtpaa-an.a.run.app
 ```

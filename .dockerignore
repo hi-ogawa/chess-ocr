@@ -2,3 +2,4 @@
 !app
 !requirements-production.txt
 !data/checkpoint/model-2021-05-12-22-17-10.pt
+!docker-entrypoint.sh
