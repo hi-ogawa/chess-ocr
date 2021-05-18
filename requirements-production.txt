@@ -1,4 +1,4 @@
 torch==1.8.1+cpu
 torchvision==0.9.1+cpu
-opencv-python==4.5.1.48
+opencv-python-headless==4.5.1.48
 Flask==1.1.2

@@ -1,16 +1,13 @@
-FROM archlinux:base-20210509.0.21942
+FROM python:3.9.5-slim-buster
 
-RUN pacman --noconfirm -Syu
-RUN pacman --noconfirm -S python python-pip mesa
+RUN mkdir -p /app
+WORKDIR /app
 
-RUN mkdir -p /chess-ocr
-WORKDIR /chess-ocr
-
-# Cache dependencies first
-COPY ./requirements-production.txt /chess-ocr
+# Cache dependencies
+COPY ./requirements-production.txt ./
 RUN pip install -r requirements-production.txt -f https://download.pytorch.org/whl/torch_stable.html
 
-# Copy app
-COPY . /chess-ocr
+# Copy the rest
+COPY . ./
 
-ENTRYPOINT ["bash", "docker-entrypoint.sh"]
+ENTRYPOINT ["sh", "docker-entrypoint.sh"]
