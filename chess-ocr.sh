@@ -22,7 +22,7 @@ fi
 
 RESPONSE=$(curl --silent -F "image=@${IMG_FILE}" ${URL})
 if [ "$?" != "0" ]; then
-    notify-send "[Chess OCR] curl failed: ${STATUS}"
+    notify-send "[Chess OCR] curl failed"
     exit 1
 fi
 
