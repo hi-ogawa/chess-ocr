@@ -29,5 +29,5 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-RESULT=$(echo "${RESPONSE}" | jq -r '.result')
-xdg-open "https://lichess.org/editor/${RESULT}"
+FEN=$(echo "${RESPONSE}" | jq -r '.result')
+xdg-open "https://lichess.org/editor/${FEN}"

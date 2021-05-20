@@ -22,8 +22,9 @@ fi
 
 RESPONSE=$(curl --silent -F "image=@${IMG_FILE}" ${URL})
 if [ "$?" != "0" ]; then
-    notify-send "[Chess OCR] curl failed"
+    notify-send "[chess-ocr.sh] curl failed"
     exit 1
 fi
 
-xdg-open $(echo "$RESPONSE" | jq -r '.lichess')
+FEN=$(echo "${RESPONSE}" | jq -r '.fen')
+xdg-open "https://lichess.org/editor/${FEN}"
