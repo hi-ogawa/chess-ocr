@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "start": "serve .",
     "lint": "eslint . --format unix",
     "format": "prettier --write .",
     "deploy": "bash gh-deploy.sh"
@@ -8,6 +9,7 @@
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
     "gh-pages": "^3.1.0",
-    "prettier": "^2.3.0"
+    "prettier": "^2.3.0",
+    "serve": "^11.3.2"
   }
 }

@@ -1,10 +1,11 @@
 Chess OCR Frontend
 
-- https://raw.githack.com/hi-ogawa/chess-ocr/master/frontend/index.html
-
 ```
 # Development
-python -m http.server
+npm start
+
+# Deployment
+npm run deploy
 ```
 
 References

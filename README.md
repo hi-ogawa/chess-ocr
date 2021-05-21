@@ -1,19 +1,19 @@
 # Chess OCR
 
-Demo 1
+- Demo 1 (api)
 
 ```
 $ curl -s -F "image=@data/example/ex000.png" https://web-vrnocjtpaa-an.a.run.app/board_to_fen
-{
-  "fen": "1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1",
-  "lichess": "https://lichess.org/editor/1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1",
-  "status": "success"
-}
+{"fen":"1r3k2/2b2pn1/p2q2pB/2pP4/2B1p2Q/1P6/P1K2P1P/6R1","status":"success"}
 ```
 
-Demo 2
+- Demo 2 (chess-ocr.sh)
 
 https://imgur.com/a/buJKxxK
+
+- Demo 3 (frontend)
+
+https://hi-ogawa.github.io/chess-ocr
 
 
 # Generate Dataset
