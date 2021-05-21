@@ -2,6 +2,7 @@ from flask import Flask, request, send_file
 import PIL.Image as Image
 from .detector import Detector, detect_board
 import io
+import base64
 
 app = Flask(__name__)
 detector = Detector('data/checkpoint/model-2021-05-12-22-17-10.pt')
@@ -18,6 +19,14 @@ def get_form_image():
   return image
 
 
+def to_data_url(image):
+  f = io.BytesIO()
+  image.save(f, format='png')
+  f.seek(0)
+  image_b64 = base64.b64encode(f.getvalue()).decode('ascii')
+  return 'data:image/png;base64,' + image_b64
+
+
 @app.errorhandler(RuntimeError)
 def handle_runtime_error(error):
   return {'status': 'error', 'message': error.args[0]}, 400
@@ -32,9 +41,13 @@ def handle_cors(response):
 
 @app.route('/detect', methods=['POST'])
 def route_detect():
+  debug = request.args.get('debug', default=False, type=bool)
   image = get_form_image()
-  fen = detector.detect(image)
-  return {'status': 'success', 'fen': fen}
+  fen, board_image = detector.detect(image)
+  resp = {'status': 'success', 'fen': fen}
+  if debug:
+    resp['debug'] = { 'board_image': to_data_url(board_image) }
+  return resp
 
 
 @app.route('/detect_board', methods=['POST'])

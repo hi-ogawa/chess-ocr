@@ -129,4 +129,4 @@ class Detector():
     def detect(self, image):
         image = self.detect_board(image)
         fen = self.board_to_fen(image)
-        return fen
+        return fen, image
