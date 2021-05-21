@@ -163,10 +163,8 @@ const RootView = () => {
       m(
         "a.button",
         {
-          disabled: !fen,
-          href: fen
-            ? `https://lichess.org/editor/${fen}`
-            : "javascript:void(0)",
+          target: "_blank",
+          href: `https://lichess.org/editor/${fen}`,
         },
         "Edit on Lichess"
       ),
