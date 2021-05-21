@@ -1,21 +1,28 @@
-const kBaseUrl = "https://web-vrnocjtpaa-an.a.run.app";
-const kDefaultSize = 1000;
+const kConfig = {
+  baseUrl: "https://web-vrnocjtpaa-an.a.run.app",
+  resizeTarget: 1000,
+};
 
 const imageToBlob = (image) => {
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = image.width;
   canvas.height = image.height;
-  const context = canvas.getContext('bitmaprenderer');
+  const context = canvas.getContext("bitmaprenderer");
   context.transferFromImageBitmap(image);
-  return new Promise(resolve => canvas.toBlob(resolve));
+  return new Promise((resolve) => canvas.toBlob(resolve));
 };
 
 const resizeImage = async (image) => {
   const { width, height } = image;
   const ar = width / height;
-  const resizeWidth  = (width > height) ? (kDefaultSize     ) : (kDefaultSize * ar);
-  const resizeHeight = (width > height) ? (kDefaultSize / ar) : (kDefaultSize     );
-  const resizedImage = await createImageBitmap(image, { resizeWidth, resizeHeight, resizeQuality: 'high' });
+  const { resizeTarget } = kConfig;
+  const resizeWidth = width > height ? resizeTarget : resizeTarget * ar;
+  const resizeHeight = width > height ? resizeTarget / ar : resizeTarget;
+  const resizedImage = await createImageBitmap(image, {
+    resizeWidth,
+    resizeHeight,
+    resizeQuality: "high",
+  });
   return resizedImage;
 };
 
@@ -30,8 +37,11 @@ const detect = async (file) => {
   file = await resizeBlob(file);
   const data = new FormData();
   data.append("image", file);
-  const resp = await fetch(kBaseUrl + '/detect', { method: "POST", body: data });
-  const result = await resp.json()
+  const resp = await fetch(kConfig.baseUrl + "/detect?debug=True", {
+    method: "POST",
+    body: data,
+  });
+  const result = await resp.json();
   return result;
 };
 
@@ -39,17 +49,66 @@ const detectBoard = async (file) => {
   file = await resizeBlob(file);
   const data = new FormData();
   data.append("image", file);
-  const resp = await fetch(kBaseUrl + '/detect_board', { method: "POST", body: data });
+  const resp = await fetch(kConfig.baseUrl + "/detect_board", {
+    method: "POST",
+    body: data,
+  });
   const result = await resp.blob();
   return result;
 };
 
 const RootView = () => {
-  let file = null;
-  let fen = '';
-  let state = '';
-  let debugBoardUrl = null;
-  let chessboard = null;
+  let file;
+  let fileUrl;
+  let fen = "8/8/8/8/8/8/8/8";
+  let boardImageUrl;
+  let chessboard;
+  let enableCapture = false;
+  let loading = false;
+
+  const oninit = async () => {
+    try {
+      // domain needs to be under https
+      await navigator.mediaDevices.getUserMedia({
+        video: true,
+        facingMode: { exact: "environment" },
+      });
+      enableCapture = true;
+      m.redraw();
+    } catch (e) {
+    }
+  };
+
+  const oncreate = (vnode) => {
+    const el = vnode.dom.querySelector(".board-gui");
+    chessboard = Chessboard(el, {
+      position: fen,
+      showNotation: false,
+      pieceTheme:
+        "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs/website/img/chesspieces/wikipedia/{piece}.png",
+    });
+  };
+
+  const onImageInputChange = async (e) => {
+    const selected = e.currentTarget.files[0];
+    if (selected) {
+      file = selected;
+      fileUrl = URL.createObjectURL(file);
+    }
+  };
+
+  const onDetectClick = async () => {
+    loading = true;
+    m.redraw();
+
+    const result = await detect(file);
+    fen = result.fen;
+    boardImageUrl = result.debug.board_image;
+    chessboard.position(fen, false);
+
+    loading = false;
+    m.redraw();
+  };
 
   const onDebugBoard = async () => {
     const result = await detectBoard(file); // : Blob
@@ -57,48 +116,83 @@ const RootView = () => {
     m.redraw();
   };
 
-  const oncreate = (vnode) => {
-    const el = vnode.dom.querySelector("#board");
-    chessboard = Chessboard(el, {
-      position: 'start',
-      pieceTheme: 'https://cdn.jsdelivr.net/gh/oakmac/chessboardjs/website/img/chesspieces/wikipedia/{piece}.png',
-    });
-  };
-
   const view = () => {
-    return m("div", [
-      m("input", {
-        type: "file",
-        capture: "environment",
-        accept: "image/*",
-        onchange: async (e) => {
-          file = e.currentTarget.files[0];
-          if (file) {
-            const result = await detect(file);
-            fen = result.fen;
-            chessboard.position(fen, false);
-            m.redraw();
-          }
-        }
-      }),
+    return m("main", [
+      m(".title", "CHESS OCR"),
+      m(".image-inputs", [
+        m("div", [
+          m("label.button", { for: "image-input-1" }, [
+            "select file",
+            m("input#image-input-1", {
+              type: "file",
+              accept: "image/*",
+              onchange: onImageInputChange,
+            }),
+          ]),
+        ]),
+        m("div", [
+          m(
+            "label.button",
+            { for: "image-input-2", disabled: !enableCapture },
+            [
+              "take photo",
+              m("input#image-input-2", {
+                type: "file",
+                accept: "image/*",
+                capture: "environment",
+                onchange: onImageInputChange,
+                disabled: !enableCapture,
+              }),
+            ]
+          ),
+        ]),
+      ]),
 
-      m("#board", { style: 'width: 256px' }),
+      m(
+        ".image-preview.preview",
+        { class: fileUrl ? "preview--selected" : "" },
+        file ? m("img", { src: fileUrl }) : "image"
+      ),
 
-      fen && m("div", `FEN: ${fen}`),
+      m(".button", { disabled: !file, onclick: file && onDetectClick }, [
+        loading && m(".spinner"),
+        m("span", "Run OCR"),
+      ]),
 
-      fen && m("div", [ m("a", { href: `https://lichess.org/editor/${fen}` }, "Open on Lichess") ]),
+      m(".separator"),
 
-      file && m("div", m("button", { onclick: onDebugBoard }, "Debug Board")),
+      m(".result-board", [
+        m(".board-gui"),
+        m(
+          ".board-image.preview",
+          { class: boardImageUrl ? "preview--selected" : "" },
+          boardImageUrl ? m("img", { src: boardImageUrl }) : "board"
+        ),
+      ]),
 
-      debugBoardUrl && m("div", m("img", { src: debugBoardUrl })),
+      m(".fen", [
+        m("label", "FEN"),
+        m("input", { value: fen, readonly: true }),
+      ]),
+
+      m(
+        "a.button",
+        {
+          disabled: !fen,
+          href: fen
+            ? `https://lichess.org/editor/${fen}`
+            : "javascript:void(0)",
+        },
+        "Edit on Lichess"
+      ),
     ]);
   };
 
-  return { oncreate, view };
+  return { oninit, oncreate, view };
 };
 
 const main = () => {
-  m.mount(document.querySelector("#root"), RootView);
+  m.mount(document.body, RootView);
 };
 
 main();
