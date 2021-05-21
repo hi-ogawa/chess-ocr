@@ -140,7 +140,7 @@ const RootView = () => {
 
       m(".button", { disabled: !file, onclick: file && onDetectClick }, [
         loading && m(".spinner"),
-        m("span", "Run OCR"),
+        m("span", "Scan"),
       ]),
 
       m(".separator"),
