@@ -130,18 +130,21 @@ a.button {
 }
 
 .board-gui {
-  width: 260px; /* chessboard.js has 2px border */
+  width: 256px;
 }
 
-.board-gui > div > div {
-  margin: 0 auto;
-  border: none;
+.board-gui cg-board {
+  pointer-events: none;
   box-shadow: var(--shadow);
 }
 
 .board-image {
   width: 256px;
   height: 256px;
+}
+
+.board-image img {
+  box-shadow: var(--shadow);
 }
 
 .fen {

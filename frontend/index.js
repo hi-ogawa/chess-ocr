@@ -1,4 +1,4 @@
-/* global m, Chessboard */
+/* global m, Chessground */
 
 const kConfig = {
   baseUrl: "https://web-vrnocjtpaa-an.a.run.app",
@@ -51,8 +51,8 @@ const RootView = () => {
   let file;
   let fileUrl;
   let fen = "8/8/8/8/8/8/8/8";
+  let cg;
   let boardImageUrl;
-  let chessboard;
   let enableCapture = false;
   let loading = false;
 
@@ -71,12 +71,11 @@ const RootView = () => {
   };
 
   const oncreate = (vnode) => {
-    const el = vnode.dom.querySelector(".board-gui");
-    chessboard = Chessboard(el, {
-      position: fen,
-      showNotation: false,
-      pieceTheme:
-        "https://cdn.jsdelivr.net/gh/oakmac/chessboardjs/website/img/chesspieces/wikipedia/{piece}.png",
+    cg = Chessground(vnode.dom.querySelector(".board-gui"), {
+      fen,
+      viewOnly: true,
+      coordinates: false,
+      animation: { enabled: false },
     });
   };
 
@@ -95,7 +94,7 @@ const RootView = () => {
     const result = await detect(file);
     fen = result.fen;
     boardImageUrl = result.debug.board_image;
-    chessboard.position(fen, false);
+    cg.set({ fen });
 
     loading = false;
     m.redraw();
