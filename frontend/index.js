@@ -1,3 +1,5 @@
+/* global m, Chessboard */
+
 const kConfig = {
   baseUrl: "https://web-vrnocjtpaa-an.a.run.app",
   resizeTarget: 1000,
@@ -45,18 +47,6 @@ const detect = async (file) => {
   return result;
 };
 
-const detectBoard = async (file) => {
-  file = await resizeBlob(file);
-  const data = new FormData();
-  data.append("image", file);
-  const resp = await fetch(kConfig.baseUrl + "/detect_board", {
-    method: "POST",
-    body: data,
-  });
-  const result = await resp.blob();
-  return result;
-};
-
 const RootView = () => {
   let file;
   let fileUrl;
@@ -76,6 +66,7 @@ const RootView = () => {
       enableCapture = true;
       m.redraw();
     } catch (e) {
+      console.error("[navigator.mediaDevices.getUserMedia]", e);
     }
   };
 
@@ -107,12 +98,6 @@ const RootView = () => {
     chessboard.position(fen, false);
 
     loading = false;
-    m.redraw();
-  };
-
-  const onDebugBoard = async () => {
-    const result = await detectBoard(file); // : Blob
-    debugBoardUrl = URL.createObjectURL(result);
     m.redraw();
   };
 

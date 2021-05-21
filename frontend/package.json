@@ -1,8 +1,11 @@
 {
   "scripts": {
+    "lint": "eslint . --format unix",
     "format": "prettier --write ."
   },
   "dependencies": {
+    "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.3.0",
     "prettier": "^2.3.0"
   }
 }
