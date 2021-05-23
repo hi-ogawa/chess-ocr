@@ -1,10 +1,13 @@
 /* global m, Chessground */
 
 const kParams = new URLSearchParams(location.search);
-const kEnv = kParams.get('env');
+const kEnv = kParams.get("env");
 
 const kConfig = {
-  baseUrl: kEnv == "dev" ? `http://${location.hostname}:5000` : "https://web-vrnocjtpaa-an.a.run.app",
+  baseUrl:
+    kEnv == "dev"
+      ? `http://${location.hostname}:5000`
+      : "https://web-vrnocjtpaa-an.a.run.app",
   resizeTarget: 1000,
 };
 
