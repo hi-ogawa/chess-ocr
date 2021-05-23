@@ -1,10 +1,13 @@
 /* global m, Chessground */
 
 const kParams = new URLSearchParams(location.search);
-const kEnv = kParams.get('env');
+const kEnv = kParams.get("env");
 
 const kConfig = {
-  baseUrl: kEnv == "dev" ? `http://${location.hostname}:5000` : "https://web-vrnocjtpaa-an.a.run.app",
+  baseUrl:
+    kEnv == "dev"
+      ? `http://${location.hostname}:5000`
+      : "https://web-vrnocjtpaa-an.a.run.app",
   resizeTarget: 1000,
 };
 
@@ -61,15 +64,16 @@ const RootView = () => {
 
   const oninit = async () => {
     try {
-      // domain needs to be under https
-      await navigator.mediaDevices.getUserMedia({
-        video: true,
-        facingMode: { exact: "environment" },
-      });
-      enableCapture = true;
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      for (const device of devices) {
+        if (device.kind === "videoinput") {
+          enableCapture = true;
+          break;
+        }
+      }
       m.redraw();
     } catch (e) {
-      console.error("[navigator.mediaDevices.getUserMedia]", e);
+      console.error("[navigator.mediaDevices.enumerateDevices]", e);
     }
   };
 
