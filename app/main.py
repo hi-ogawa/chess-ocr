@@ -3,9 +3,10 @@ import PIL.Image as Image
 from .detector import Detector, detect_board
 import io
 import base64
+import os
 
 app = Flask(__name__)
-detector = Detector('data/checkpoint/model-2021-05-12-22-17-10.pt')
+detector = Detector(os.environ['APP_MODEL_FILE'], os.environ.get('APP_MODEL_LOG_DIR'))
 
 
 def get_form_image():

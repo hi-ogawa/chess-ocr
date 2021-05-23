@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "serve .",
+    "start": "serve -l 8000 .",
     "lint": "eslint . --format unix",
     "format": "prettier --write .",
     "deploy": "bash gh-deploy.sh"

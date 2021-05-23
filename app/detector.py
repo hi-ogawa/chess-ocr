@@ -4,44 +4,63 @@ import torchvision.transforms.functional as VF
 import cv2 as cv
 import numpy as np
 import PIL.Image as Image
+from datetime import datetime
+import random
 
 #
 # Piece Detection
 #
 
+LABELS = ['wP', 'wN', 'wB', 'wR', 'wQ', 'wK', 'bP', 'bN', 'bB', 'bR', 'bQ', 'bK', 'empty']
+FEN_PIECE_CHARS = ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k']
+
+
+# [0, 1] -> [-1, 1]
+normalize = lambda t: 2 * t - 1
+
+
 def make_model():
     in_h = in_w = 32
     out_size = 13
+    channel_size = 8
+    hidden_size = 512
+    dropout = 0.3
     return nn.Sequential(
-        nn.Conv2d(1, 4, kernel_size=3, padding=1),
+        nn.Conv2d(1, channel_size, kernel_size=3, padding=1),
         nn.ReLU(),
-        nn.Conv2d(4, 4, kernel_size=3, padding=1),
+        nn.Conv2d(channel_size, channel_size, kernel_size=3, padding=1),
         nn.ReLU(),
-        nn.Conv2d(4, 4, kernel_size=3, padding=1),
+        nn.Conv2d(channel_size, channel_size, kernel_size=3, padding=1),
         nn.ReLU(),
         nn.Flatten(),
-        nn.Linear(4 * in_h * in_w, 256),
-        nn.Dropout(0.3),
-        nn.Linear(256, 256),
-        nn.Dropout(0.3),
+        nn.Linear(channel_size * in_h * in_w, hidden_size),
+        nn.Dropout(dropout),
         nn.ReLU(),
-        nn.Linear(256, out_size),
+        nn.Linear(hidden_size, hidden_size),
+        nn.Dropout(dropout),
+        nn.ReLU(),
+        nn.Linear(hidden_size, out_size),
     )
 
 
-def predict8x8(model, image):
+def predict8x8(model, image, log_dir=None):
     image = image.convert('L').resize([256, 256])
     x = VF.to_tensor(image)
     x = x.reshape([1, 8, 32, 8, 32]).permute([0, 1, 3, 2, 4]).reshape([64, 1, 32, 32])
-    y = model(x)
+    y = model(normalize(x))
     z, w = torch.max(torch.softmax(y, dim=-1), dim=-1)
     z = z.reshape([8, 8]).detach()
     w = w.reshape([8, 8]).detach()
+    if log_dir is not None:
+        for i, p, q in zip(range(64), x, w.reshape(64)):
+            j = random.randrange(0, 10000)
+            label = LABELS[q]
+            timestamp = datetime.strftime(datetime.now(), "%F-%H-%M-%S")
+            VF.to_pil_image(p).convert("RGB").save(f"{log_dir}/{label}--{timestamp}--{i:02d}--{j:04d}.png")
     return z, w
 
 
 def to_fen(result):
-    FEN_PIECE_CHARS = ['P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k']
     fen = ''
     cnt = 0
     for i in range(8):
@@ -114,19 +133,38 @@ def order_vertices(vs):
 
 
 class Detector():
-    def __init__(self, checkpoint_file):
+    def __init__(self, checkpoint_file, log_dir=None):
         self.model = make_model()
         self.model.load_state_dict(torch.load(checkpoint_file)['model_state_dict'])
         self.model.eval()
+        self.log_dir = log_dir
 
     def detect_board(self, image):
         return detect_board(image, (256, 256))
 
     def board_to_fen(self, image):
-        probability, labels = predict8x8(self.model, image)
+        probability, labels = predict8x8(self.model, image, self.log_dir)
         return to_fen(labels)
 
     def detect(self, image):
         image = self.detect_board(image)
         fen = self.board_to_fen(image)
         return fen, image
+
+
+def main(checkpoint_file, in_directory, out_directory):
+    import pathlib
+    detector = Detector(checkpoint_file, out_directory)
+    in_path = pathlib.Path(in_directory)
+    for ext in ["png", "jpg"]:
+        for file in in_path.glob(f"*.{ext}"):
+            detector.detect(Image.open(file))
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--checkpoint-file")
+    parser.add_argument("--in-directory")
+    parser.add_argument("--out-directory")
+    main(**parser.parse_args().__dict__)

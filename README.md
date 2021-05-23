@@ -80,7 +80,9 @@ See `detect_board.ipynb`
 # API Server
 
 ```
-FLASK_APP=app/main.py FLASK_ENV=development flask run --reload --debugger
+export APP_MODEL_FILE=data/checkpoint/model-2021-05-23-19-37-29.pt
+export APP_MODEL_LOG_DIR=data/log
+FLASK_APP=app/main.py FLASK_ENV=development FLASK_RUN_HOST=0.0.0.0 flask run --reload --debugger
 curl -F "image=@data/example/ex000.png" http://localhost:5000/board_to_fen
 ```
 
@@ -116,4 +118,21 @@ bash run.sh setup-project
 bash run.sh setup-run
 bash run.sh deploy
 bash run.sh show url # => https://web-vrnocjtpaa-an.a.run.app
+```
+
+# Make more training data based on current model
+
+```
+# Generate predictions
+python app/detector.py --checkpoint data/checkpoint/model-2021-05-22-20-30-45.pt --in data/train-v2/original --out data/train-v2/prediction
+
+# Manually fix incorrect labels and put them into data/train-v2/fixed/wP,wB,... then rename them by this script
+shopt -s nullglob
+i=0
+for TYPE in wP wN wB wR wQ wK bP bN bB bR bQ bK empty; do
+  for FILE in data/train-v2/fixed/$TYPE/*.png; do
+    cp $FILE data/train-v2/fixed/renamed/$TYPE--ex$i.png
+    i=$(( $i + 1 ))
+  done
+done
 ```
