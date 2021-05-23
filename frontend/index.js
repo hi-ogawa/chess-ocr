@@ -64,15 +64,16 @@ const RootView = () => {
 
   const oninit = async () => {
     try {
-      // domain needs to be under https
-      await navigator.mediaDevices.getUserMedia({
-        video: true,
-        facingMode: { exact: "environment" },
-      });
-      enableCapture = true;
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      for (const device of devices) {
+        if (device.kind === "videoinput") {
+          enableCapture = true;
+          break;
+        }
+      }
       m.redraw();
     } catch (e) {
-      console.error("[navigator.mediaDevices.getUserMedia]", e);
+      console.error("[navigator.mediaDevices.enumerateDevices]", e);
     }
   };
 
