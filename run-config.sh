@@ -13,7 +13,7 @@ PLATFORM='managed'
 DEPLOY_OPTS=(
   --allow-unauthenticated
   --cpu=1
-  --memory=256Mi   # default 256Mi
+  --memory=512Mi   # default 256Mi
   --concurrency=10 # default 80
   --timeout=1m     # default 5m
 )

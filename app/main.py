@@ -4,6 +4,7 @@ from .detector import Detector, detect_board
 import io
 import base64
 import os
+import requests
 
 app = Flask(__name__)
 detector = Detector(os.environ['APP_MODEL_FILE'], os.environ.get('APP_MODEL_LOG_DIR'))
@@ -20,12 +21,27 @@ def get_form_image():
   return image
 
 
-def to_data_url(image):
+def to_data_url(image, format='png'):
   f = io.BytesIO()
-  image.save(f, format='png')
+  image.save(f, format=format)
   f.seek(0)
   image_b64 = base64.b64encode(f.getvalue()).decode('ascii')
-  return 'data:image/png;base64,' + image_b64
+  return f"data:image/{format};base64,{image_b64}"
+
+
+def run_chessvision(image):
+  image = image.convert("RGB")
+  image.thumbnail([1000, 1000])
+  image_url = to_data_url(image, 'jpeg')
+  payload = {
+    "board_orientation": "predict",
+    "cropped": True,
+    "current_player": "white",
+    "predict_turn": True,
+    "image": image_url
+  }
+  resp = requests.post("https://app.chessvision.ai/predict", json=payload)
+  return resp.json()
 
 
 @app.errorhandler(RuntimeError)
@@ -42,12 +58,17 @@ def handle_cors(response):
 
 @app.route('/detect', methods=['POST'])
 def route_detect():
-  debug = request.args.get('debug', default=False, type=bool)
+  is_true = lambda x: x.lower() == "true"
+  debug = request.args.get('debug', default=False, type=is_true)
+  chessvision = request.args.get('chessvision', default=False, type=is_true)
   image = get_form_image()
   fen, board_image = detector.detect(image)
   resp = {'status': 'success', 'fen': fen}
   if debug:
     resp['debug'] = { 'board_image': to_data_url(board_image) }
+  if chessvision:
+    cv_resp = run_chessvision(image)
+    resp['fen'] = cv_resp['result'].split('_')[0]
   return resp
 
 

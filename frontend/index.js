@@ -2,6 +2,7 @@
 
 const kParams = new URLSearchParams(location.search);
 const kEnv = kParams.get("env");
+const kChessvision = kParams.get("chessvision");
 
 const kConfig = {
   baseUrl:
@@ -41,16 +42,25 @@ const resizeBlob = async (blob) => {
   return blob;
 };
 
+const fetchJson = async (...args) => {
+  const response = await fetch(...args);
+  if (!response.ok) {
+    throw new Error(response.status);
+  }
+  return response.json();
+};
+
 const detect = async (file) => {
   file = await resizeBlob(file);
   const data = new FormData();
   data.append("image", file);
-  const resp = await fetch(kConfig.baseUrl + "/detect?debug=True", {
-    method: "POST",
-    body: data,
-  });
-  const result = await resp.json();
-  return result;
+  return fetchJson(
+    kConfig.baseUrl + `/detect?debug=true&chessvision=${kChessvision}`,
+    {
+      method: "POST",
+      body: data,
+    }
+  );
 };
 
 const RootView = () => {
@@ -97,12 +107,14 @@ const RootView = () => {
   const onDetectClick = async () => {
     loading = true;
     m.redraw();
-
-    const result = await detect(file);
-    fen = result.fen;
-    boardImageUrl = result.debug.board_image;
-    cg.set({ fen });
-
+    try {
+      const result = await detect(file);
+      fen = result.fen;
+      boardImageUrl = result.debug.board_image;
+      cg.set({ fen });
+    } catch (e) {
+      alert(`[ERROR] ${e}`);
+    }
     loading = false;
     m.redraw();
   };
