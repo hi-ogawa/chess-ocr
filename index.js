@@ -2,6 +2,7 @@
 
 const kParams = new URLSearchParams(location.search);
 const kEnv = kParams.get("env");
+const kChessvision = kParams.get("chessvision");
 
 const kConfig = {
   baseUrl:
@@ -45,10 +46,13 @@ const detect = async (file) => {
   file = await resizeBlob(file);
   const data = new FormData();
   data.append("image", file);
-  const resp = await fetch(kConfig.baseUrl + "/detect?debug=True", {
-    method: "POST",
-    body: data,
-  });
+  const resp = await fetch(
+    kConfig.baseUrl + `/detect?debug=true&chessvision=${kChessvision}`,
+    {
+      method: "POST",
+      body: data,
+    }
+  );
   const result = await resp.json();
   return result;
 };
