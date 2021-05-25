@@ -80,7 +80,7 @@ See `detect_board.ipynb`
 # API Server
 
 ```
-export APP_MODEL_FILE=data/checkpoint/model-2021-05-23-19-37-29.pt
+export APP_MODEL_FILE=data/checkpoint/default.pt
 export APP_MODEL_LOG_DIR=data/log
 FLASK_APP=app/main.py FLASK_ENV=development FLASK_RUN_HOST=0.0.0.0 flask run --reload --debugger
 curl -F "image=@data/example/ex000.png" http://localhost:5000/board_to_fen

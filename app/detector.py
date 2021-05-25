@@ -20,26 +20,20 @@ normalize = lambda t: 2 * t - 1
 
 
 def make_model():
-    in_h = in_w = 32
-    out_size = 13
-    channel_size = 8
-    hidden_size = 512
-    dropout = 0.3
     return nn.Sequential(
-        nn.Conv2d(1, channel_size, kernel_size=3, padding=1),
+        nn.Conv2d(1, 32, kernel_size=3),
         nn.ReLU(),
-        nn.Conv2d(channel_size, channel_size, kernel_size=3, padding=1),
+        nn.MaxPool2d(2),
+        nn.Conv2d(32, 64, kernel_size=3),
         nn.ReLU(),
-        nn.Conv2d(channel_size, channel_size, kernel_size=3, padding=1),
+        nn.MaxPool2d(2),
+        nn.Conv2d(64, 128, kernel_size=3),
         nn.ReLU(),
+        nn.MaxPool2d(2),
+        nn.AdaptiveAvgPool2d(1),
         nn.Flatten(),
-        nn.Linear(channel_size * in_h * in_w, hidden_size),
-        nn.Dropout(dropout),
-        nn.ReLU(),
-        nn.Linear(hidden_size, hidden_size),
-        nn.Dropout(dropout),
-        nn.ReLU(),
-        nn.Linear(hidden_size, out_size),
+        nn.Dropout(0.3),
+        nn.Linear(128, 13)
     )
 
 
