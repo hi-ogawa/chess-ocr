@@ -4,9 +4,10 @@ numpy
 matplotlib
 torch==1.8.1
 torchvision==0.9.1
-pytorch-lightning==1.2.10
 tqdm
-opencv-python==4.5.1.48
+opencv-python-headless==4.5.1.48
 chess
 Flask==1.1.2
 requests
+pytorch-lightning==1.3.2
+jsonargparse[signatures]

@@ -73,6 +73,10 @@ See also `generate.ipynb`.
 
 See `detect_piece.ipynb`
 
+```
+python -m app.train --data.directory data/train --data.batch_size 128 --trainer.max_epoch 200
+```
+
 # Board detection
 
 See `detect_board.ipynb`
