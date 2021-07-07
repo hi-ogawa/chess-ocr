@@ -1,0 +1,19 @@
+{
+  "include": ["src/*.ts"],
+  "exclude": [],
+  "compilerOptions": {
+    "target": "ES2015",
+    "lib": ["DOM", "ES6"],
+    "jsx": "react",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "moduleResolution": "node"
+  }
+}

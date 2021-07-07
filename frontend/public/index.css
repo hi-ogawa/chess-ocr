@@ -1,3 +1,7 @@
+@import url(https://cdn.jsdelivr.net/gh/ornicar/chessground@v7.11.0/assets/chessground.base.css);
+@import url(https://cdn.jsdelivr.net/gh/ornicar/chessground@v7.11.0/assets/chessground.brown.css);
+@import url(https://cdn.jsdelivr.net/gh/ornicar/chessground@v7.11.0/assets/chessground.cburnett.css);
+
 html {
   color-scheme: dark;
 
@@ -28,7 +32,10 @@ body {
   font-size: 16px;
   background: var(--c-gray-1);
   color: var(--c-gray-4);
+}
 
+#root {
+  width: 100%;
   display: flex;
   justify-content: center;
 }
@@ -82,12 +89,13 @@ main {
   align-items: center;
 }
 
-.button:hover {
+.button:hover:not(.button--disabled) {
   filter: brightness(1.2);
 }
 
-.button[disabled] {
+.button--disabled {
   cursor: not-allowed;
+  transition: none;
   filter: brightness(0.8);
 }
 

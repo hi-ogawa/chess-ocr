@@ -1,7 +1,0 @@
-{
-  "env": {
-    "es2020": true,
-    "browser": true
-  },
-  "extends": ["eslint:recommended", "prettier"]
-}

@@ -1,15 +1,32 @@
 {
   "scripts": {
-    "start": "serve -l 8000 .",
-    "lint": "eslint . --format unix",
+    "start": "serve -l 8000 public",
+    "check": "tsc src/index.ts --noEmit",
+    "build": "rollup --config",
+    "build:watch": "npm run build -- --watch --no-watch.clearScreen",
+    "build:production": "NODE_ENV=production npm run build",
     "format": "prettier --write .",
     "deploy": "bash gh-deploy.sh"
   },
-  "dependencies": {
-    "eslint": "^7.26.0",
-    "eslint-config-prettier": "^8.3.0",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "@rollup/plugin-replace": "^2.4.2",
+    "@rollup/plugin-sucrase": "^3.1.0",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "@types/react": "^17.0.13",
+    "@types/react-dom": "^17.0.8",
     "gh-pages": "^3.1.0",
     "prettier": "^2.3.0",
-    "serve": "^11.3.2"
+    "rollup": "^2.52.7",
+    "rollup-plugin-terser": "^7.0.2",
+    "serve": "^11.3.2",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "chessground": "=7.11.0",
+    "classnames": "^2.3.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }
