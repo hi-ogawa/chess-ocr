@@ -5,9 +5,10 @@ matplotlib
 torch==1.8.1
 torchvision==0.9.1
 tqdm
-opencv-python-headless==4.5.1.48
+opencv-contrib-python-headless==4.5.1.48
 chess
 Flask==1.1.2
 requests
 pytorch-lightning==1.3.2
 jsonargparse[signatures]
+nbdime

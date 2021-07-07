@@ -11,7 +11,8 @@ import PIL.Image as Image
 import pathlib
 from functools import partial
 
-from .model import LABELS, make_model, normalize, to_loss, to_pred, to_prob, to_prob_pred
+from .model import *
+from .misc import *
 
 
 def random_noise(t, mean=0, std=1):
@@ -20,10 +21,11 @@ def random_noise(t, mean=0, std=1):
 
 def make_augmentation():
     return VT.Compose([
+        VT.RandomApply([partial(random_noise, std=0.1)], p=0.5),
+        VT.RandomErasing(scale=[0.05, 0.15], p=0.5),
         VT.RandomApply([VT.GaussianBlur(3)], p=0.5),
         VT.RandomAffine(30, (0.3, 0.3), (0.7, 1.3), [-5, 5]),
-        VT.RandomApply([partial(random_noise, std=0.1)], p=0.5),
-        lambda x: VF.adjust_brightness(x, torch.empty(1).uniform_(0.7, 1.3)),
+        lambda x: VF.adjust_brightness(x, torch.empty(1).uniform_(0.5, 1.5)),
     ])
 
 
